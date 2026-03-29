@@ -1,0 +1,61 @@
+name: Check Claude Code Updates
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday 9:00 UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get current tracked version
+        id: current
+        run: |
+          VERSION=$(grep -oP 'v[\d.]+' skills/create-harness/references/official-builtins.md | head -1)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Get latest Claude Code version
+        id: latest
+        run: |
+          LATEST=$(npm view @anthropic-ai/claude-code version 2>/dev/null || echo "unknown")
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Check if update needed
+        if: steps.current.outputs.version != steps.latest.outputs.version && steps.latest.outputs.version != 'unknown'
+        run: |
+          # Check if an open issue already exists
+          EXISTING=$(gh issue list --label "update-check" --state open --json number --jq length)
+          if [ "$EXISTING" -gt "0" ]; then
+            echo "Open update issue already exists, skipping"
+            exit 0
+          fi
+
+          gh issue create \
+            --title "Claude Code ${{ steps.latest.outputs.version }} released — review references" \
+            --label "update-check" \
+            --body "$(cat <<'EOF'
+          Claude Code version changed: `${{ steps.current.outputs.version }}` → `${{ steps.latest.outputs.version }}`
+
+          ## Checklist
+
+          - [ ] `official-builtins.md` — new built-in tools, commands, or subagent types?
+          - [ ] `official-builtins.md` — new hook events?
+          - [ ] `official-builtins.md` — new Agent Teams features?
+          - [ ] `templates.md` — hook format or settings.json schema changes?
+          - [ ] `templates.md` — plugin.json manifest schema changes?
+          - [ ] `pattern-library.md` — new patterns from community harness projects?
+          - [ ] Update version reference in `official-builtins.md` header
+
+          ## How to update
+
+          1. Open a Claude Code session in the meta-harness repo
+          2. Run: `WebSearch "Claude Code ${{ steps.latest.outputs.version }} changelog"`
+          3. Update affected reference files
+          4. Push changes
+          EOF
+          )"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

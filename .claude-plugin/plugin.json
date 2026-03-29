@@ -1,0 +1,24 @@
+{
+  "name": "meta-harness",
+  "version": "1.0.0",
+  "description": "Intelligent harness creator for Claude Code. Analyzes any project, selects optimal patterns from a curated library of proven architectures (ECC, gstack, OmO, OMC), and generates tailored agents, skills, hooks, and rules — while auto-checking official features to avoid duplication.",
+  "author": {
+    "name": "bzantium",
+    "url": "https://github.com/bzantium"
+  },
+  "license": "MIT",
+  "skills": ["./skills/"],
+  "agents": [
+    "./agents/scout.md",
+    "./agents/architect.md"
+  ],
+  "keywords": [
+    "harness",
+    "generator",
+    "meta-skill",
+    "agents",
+    "skills",
+    "hooks",
+    "orchestration"
+  ]
+}

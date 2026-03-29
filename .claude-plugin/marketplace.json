@@ -1,0 +1,20 @@
+{
+  "name": "meta-harness",
+  "owner": {
+    "name": "bzantium",
+    "url": "https://github.com/bzantium"
+  },
+  "plugins": [
+    {
+      "name": "meta-harness",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/bzantium/meta-harness.git"
+      },
+      "description": "Intelligent harness creator — analyzes any project, selects from 16 curated patterns, and generates tailored agents, skills, hooks, and rules.",
+      "version": "1.0.0",
+      "license": "MIT",
+      "keywords": ["harness", "agents", "skills", "hooks", "generator", "meta-skill"]
+    }
+  ]
+}
